@@ -15,8 +15,8 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource"
 	"github.com/hashicorp/terraform-plugin-framework/types"
 	"github.com/hashicorp/terraform-plugin-log/tflog"
-	"github.com/infobip/infobip-api-go-client/v3/pkg/infobip"
-	"github.com/infobip/infobip-api-go-client/v3/pkg/infobip/api"
+	"github.com/infobip-community/infobip-api-go-sdk/v3/pkg/infobip"
+	"github.com/infobip-community/infobip-api-go-sdk/v3/pkg/infobip/models"
 )
 
 // Ensure the implementation satisfies the expected interfaces.
@@ -149,23 +149,7 @@ func (p *pocinfobipemailsProvider) Configure(ctx context.Context, req provider.C
 
 	tflog.Debug(ctx, "Creating Infobip client")
 
-	configuration := infobip.NewConfiguration()
-	configuration.Host = base_url
-
-	infobipClient := api.NewAPIClient(configuration)
-
-	auth := context.WithValue(
-		context.Background(),
-		infobip.ContextAPIKeys,
-		map[string]infobip.APIKey{
-			"APIKeyHeader": {Key: api_key, Prefix: "App"},
-		},
-	)
-
-	apiResponse, httpResponse, err := infobipClient.
-		EmailAPI.
-		GetAllDomains(auth).
-		Execute()
+	client, err := infobip.NewClient(base_url, api_key)
 
 	// Check for errors
 	if err != nil {
@@ -173,19 +157,28 @@ func (p *pocinfobipemailsProvider) Configure(ctx context.Context, req provider.C
 		return
 	}
 
+	params := models.GetEmailDomainsParams{
+		Size: 10,
+		Page: 0,
+	}
+	domainsResp, _, err := client.Email.GetDomains(context.Background(), params)
+	if err != nil {
+		resp.Diagnostics.AddError("Failed to fetch all domains", err.Error())
+		return
+	}
+
 	// Output response details for debugging
-	tflog.Info(ctx, "Response: "+fmt.Sprintf("%+v", apiResponse))
-	tflog.Info(ctx, "HTTP Response Details: "+fmt.Sprintf("%+v", httpResponse))
+	tflog.Info(ctx, "Response: "+fmt.Sprintf("%+v", domainsResp))
 
 	// Validate response
-	if apiResponse == nil || apiResponse.Results == nil || len(apiResponse.Results) == 0 {
-		resp.Diagnostics.AddError("Invalid response", "Expected messages, but got: "+fmt.Sprintf("%+v", apiResponse))
+	if domainsResp.Results == nil || len(domainsResp.Results) == 0 {
+		resp.Diagnostics.AddError("Invalid response", "Expected messages, but got: "+fmt.Sprintf("%+v", domainsResp))
 	}
 
 	// Make the HashiCups client available during DataSource and Resource
 	// type Configure methods.
-	resp.DataSourceData = infobipClient
-	resp.ResourceData = infobipClient
+	resp.DataSourceData = client
+	resp.ResourceData = client
 
 	tflog.Info(ctx, "Configured Infobip client", map[string]any{"success": true})
 }
