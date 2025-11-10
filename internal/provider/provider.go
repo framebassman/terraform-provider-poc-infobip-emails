@@ -53,6 +53,11 @@ type pocInfobipEmailsProviderModel struct {
 	ApiKey  types.String `tfsdk:"api_key"`
 }
 
+type providerClient struct {
+	client *api.APIClient
+	apiKey string
+}
+
 // Schema defines the provider-level schema for configuration data.
 func (p *pocinfobipemailsProvider) Schema(_ context.Context, _ provider.SchemaRequest, resp *provider.SchemaResponse) {
 	resp.Schema = schema.Schema{
@@ -161,9 +166,7 @@ func (p *pocinfobipemailsProvider) Configure(ctx context.Context, req provider.C
 	auth := context.WithValue(
 		context.Background(),
 		infobip.ContextAPIKeys,
-		map[string]infobip.APIKey{
-			"APIKeyHeader": {Key: api_key, Prefix: "App"},
-		},
+		map[string]infobip.APIKey{"APIKeyHeader": {Key: api_key, Prefix: "App"}},
 	)
 
 	apiResponse, httpResponse, err := infobipClient.
@@ -188,20 +191,24 @@ func (p *pocinfobipemailsProvider) Configure(ctx context.Context, req provider.C
 
 	// Make the HashiCups client available during DataSource and Resource
 	// type Configure methods.
-	resp.DataSourceData = infobipClient
-	resp.ResourceData = infobipClient
-
+	// Build provider payload containing both client and apiKey
+	provData := &providerClient{
+		client: infobipClient,
+		apiKey: api_key,
+	}
+	resp.DataSourceData = provData
+	resp.ResourceData = provData
 	tflog.Info(ctx, "Configured Infobip client", map[string]any{"success": true})
 }
 
 // DataSources defines the data sources implemented in the provider.
 func (p *pocinfobipemailsProvider) DataSources(_ context.Context) []func() datasource.DataSource {
-	return []func() datasource.DataSource{
-		NewEmailTemplatesDataSource,
-	}
+	return nil
 }
 
 // Resources defines the resources implemented in the provider.
 func (p *pocinfobipemailsProvider) Resources(_ context.Context) []func() resource.Resource {
-	return nil
+	return []func() resource.Resource{
+		NewEmailTemplateResource,
+	}
 }
