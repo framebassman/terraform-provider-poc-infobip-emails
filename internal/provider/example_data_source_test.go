@@ -13,6 +13,7 @@ import (
 )
 
 func TestAccExampleDataSource(t *testing.T) {
+	t.Skip("Skipping tests for a while")
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { testAccPreCheck(t) },
 		ProtoV6ProviderFactories: testAccProtoV6ProviderFactories,

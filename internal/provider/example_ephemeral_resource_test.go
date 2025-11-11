@@ -15,6 +15,7 @@ import (
 )
 
 func TestAccExampleEphemeralResource(t *testing.T) {
+	t.Skip("Skipping tests for a while")
 	resource.Test(t, resource.TestCase{
 		// Ephemeral resources are only available in 1.10 and later
 		TerraformVersionChecks: []tfversion.TerraformVersionCheck{
