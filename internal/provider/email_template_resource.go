@@ -174,7 +174,7 @@ func (r *EmailTemplateResource) Create(ctx context.Context, req resource.CreateR
 	}
 
 	// Map response body to schema and populate Computed attribute values
-	plan.ID = types.Int64Value(int64(emailTemplate.ID))
+	plan.ID = types.Int64Value(emailTemplate.ID)
 	plan.Name = types.StringValue(emailTemplate.Name)
 	plan.From = types.StringValue(emailTemplate.From)
 	plan.ReplyTo = types.StringValue(emailTemplate.ReplyTo)
@@ -227,7 +227,7 @@ func (r *EmailTemplateResource) Read(ctx context.Context, req resource.ReadReque
 	}
 
 	// Overwrite items with refreshed state
-	state.ID = types.Int64Value(int64(emailTemplate.ID))
+	state.ID = types.Int64Value(emailTemplate.ID)
 	state.Name = types.StringValue(emailTemplate.Name)
 	state.From = types.StringValue(emailTemplate.From)
 	state.ReplyTo = types.StringValue(emailTemplate.ReplyTo)
@@ -296,7 +296,7 @@ func (r *EmailTemplateResource) Update(ctx context.Context, req resource.UpdateR
 	}
 
 	// Map response back to state (preserve created_at if not returned)
-	plan.ID = types.Int64Value(int64(emailTemplate.ID))
+	plan.ID = types.Int64Value(emailTemplate.ID)
 	plan.Name = types.StringValue(emailTemplate.Name)
 	plan.From = types.StringValue(emailTemplate.From)
 	plan.ReplyTo = types.StringValue(emailTemplate.ReplyTo)

@@ -8,7 +8,7 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/resource/schema/planmodifier"
 )
 
-// Ensure interface compliance
+// Ensure interface compliance.
 var _ planmodifier.String = htmlWhitespaceInsensitiveModifier{}
 
 // htmlWhitespaceInsensitiveModifier suppresses diffs when only whitespace differs.
