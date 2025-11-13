@@ -212,7 +212,10 @@ func (r *EmailTemplateResource) Read(ctx context.Context, req resource.ReadReque
 	)
 
 	var idInt int64
-	fmt.Sscanf(state.ID.ValueString(), "%d", &idInt)
+	_, err := fmt.Sscanf(state.ID.ValueString(), "%d", &idInt)
+	if err != nil {
+		return
+	}
 	emailTemplate, httpResponse, err := r.infobipClient.
 		EmailAPI.
 		GetEmailTemplate(auth).
@@ -275,7 +278,10 @@ func (r *EmailTemplateResource) Update(ctx context.Context, req resource.UpdateR
 
 	// Call update API
 	var idInt int64
-	fmt.Sscanf(state.ID.ValueString(), "%d", &idInt)
+	_, err := fmt.Sscanf(state.ID.ValueString(), "%d", &idInt)
+	if err != nil {
+		return
+	}
 	emailTemplate, httpResponse, err := r.infobipClient.
 		EmailAPI.
 		UpdateEmailTemplate(auth).
@@ -345,7 +351,10 @@ func (r *EmailTemplateResource) Delete(ctx context.Context, req resource.DeleteR
 
 	// Call delete API
 	var idInt int64
-	fmt.Sscanf(data.ID.ValueString(), "%d", &idInt)
+	_, err := fmt.Sscanf(data.ID.ValueString(), "%d", &idInt)
+	if err != nil {
+		return
+	}
 	httpResponse, err := r.infobipClient.
 		EmailAPI.
 		RemoveEmailTemplate(auth).
